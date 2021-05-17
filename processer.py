@@ -76,9 +76,15 @@ def main(**kwargs):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    # Configuration
     parser.add_argument("-t", "--tasks_path", default='./all_tasks.json',
                         help="file path to read tasks")
     parser.add_argument("-p", "--projects_path", default='./all_projects.json',
                         help="file path to read projects")
+
+    # Filters
+    parser.add_argument("project", action="store", help="filter by project name")
+
     args = parser.parse_args()
-    main(projects=args.projects_path, tasks=args.tasks_path)
+    print(args)
+    # main(projects=args.projects_path, tasks=args.tasks_path)
