@@ -11,3 +11,6 @@ venv/*
 ## Jetbrains
 .idea/
 
+##
+build/
+
