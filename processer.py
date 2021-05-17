@@ -1,5 +1,6 @@
 import json
 from typing import Dict, List, Tuple, Iterator
+import argparse
 
 
 # Project = Dict[str, int, str, int, bool, bool, int, bool, str]
@@ -74,4 +75,10 @@ def main(**kwargs):
 
 
 if __name__ == '__main__':
-    main(projects='./all_projects.json', tasks='./all_tasks.json')
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-t", "--tasks_path", default='./all_tasks.json',
+                        help="file path to read tasks")
+    parser.add_argument("-p", "--projects_path", default='./all_projects.json',
+                        help="file path to read projects")
+    args = parser.parse_args()
+    main(projects=args.projects_path, tasks=args.tasks_path)
