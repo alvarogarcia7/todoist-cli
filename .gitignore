@@ -1,0 +1,13 @@
+## Auth Keys
+keys.sh
+
+## Data
+*.json
+
+## Virtual Environment
+venv/*
+!venv/.gitkeep
+
+## Jetbrains
+.idea/
+
