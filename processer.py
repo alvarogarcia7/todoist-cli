@@ -78,7 +78,6 @@ class Todoist:
         return self.tasks.filter_by_project_id(project_id)
 
     def all_tasks_due(self, duedate: str) -> List:
-        desired_date: Optional[datetime] = None
         if duedate == 'today':
             desired_date = datetime.now(tz=timezone.utc)
         elif duedate == 'yesterday':
