@@ -3,7 +3,8 @@ keys.sh
 
 ## Data
 *.json
-data_*/
+data/*
+!data/.gitkeep
 
 ## Virtual Environment
 venv/*
