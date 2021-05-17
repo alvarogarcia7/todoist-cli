@@ -13,7 +13,7 @@ class Tasks:
 
     def filter_by_project_id(self, project_id) -> List:
         return self._sort_by_created_ASC(
-            filter(lambda task: task['project_id'] == project_id, self.values)
+            filter(lambda task: task['project_id'] == project_id and task['section_id'] == 0, self.values)
         )
 
     @staticmethod
@@ -100,6 +100,7 @@ class Todoist:
 
 
 def main(args):
+    print(args)
     projects_path = args.projects_path
     tasks_path = args.tasks_path
 
@@ -139,7 +140,4 @@ if __name__ == '__main__':
     parser.add_argument("--due", type=str, help="filter by task due date")
     parser.add_argument("--limit", type=int, help="limit results")
 
-    args = parser.parse_args()
-    print(args)
-
-    main(args)
+    main(parser.parse_args())
