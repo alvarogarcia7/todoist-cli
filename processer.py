@@ -1,6 +1,8 @@
 import json
 from typing import Dict, List, Tuple, Iterator
 import argparse
+from datetime import date, timedelta, datetime, timezone
+from dateutil import parser as dateutil_parser
 
 
 # Project = Dict[str, int, str, int, bool, bool, int, bool, str]
@@ -19,6 +21,20 @@ class Tasks:
         return sorted(tasks,
                       key=lambda task: task['created']
                       )
+
+    def filter_by_date(self, date_value: date) -> List:
+        result = []
+        for task in self.values:
+            task_date: date = dateutil_parser.parse(task['created'])
+            task['created_date'] = task_date
+
+        for task in self.values:
+            if task['created_date'] <= date_value:
+                result.append(task)
+
+        result = sorted(result, key=lambda task: task['created_date'], reverse=True)
+
+        return result
 
 
 class Projects:
@@ -53,10 +69,31 @@ class Todoist:
         project_id = self.projects.by_name(project_name)[0]['id']
         return self.tasks.filter_by_project_id(project_id)
 
+    def all_tasks_due(self, duedate: str) -> List:
+        desired_date = None
+        if duedate == 'today':
+            desired_date = datetime.now(tz=timezone.utc)
+        elif duedate == 'yesterday':
+            desired_date = (datetime.now(tz=timezone.utc) - timedelta(days=1))
+        else:
+            desired_date = None
 
-def main(**kwargs):
-    tasks_path = kwargs['tasks']
-    projects_path = kwargs['projects']
+        if desired_date is None:
+            desired_date = date.fromisoformat(duedate)
+
+        return self.tasks.filter_by_date(desired_date)
+
+    @staticmethod
+    def limit(results, limit):
+        if limit is None:
+            return results
+        else:
+            return results[:limit]
+
+
+def main(args):
+    projects_path = args.projects_path
+    tasks_path = args.tasks_path
 
     print(f"[Cache] Reading tasks from {tasks_path}")
     print(f"[Cache] Reading projects from {projects_path}")
@@ -69,9 +106,16 @@ def main(**kwargs):
 
     todoist: Todoist = Todoist(Tasks(tasks), Projects(projects))
 
-    print("Tasks of project 'today'")
-    for task in todoist.all_tasks_of_project_name('today'):
-        print(task['content'])
+    if args.project:
+        print(f"Tasks of project '{args.project}' (sorted date DESC):")
+        for task in todoist.limit(todoist.all_tasks_of_project_name(args.project), args.limit):
+            print(task['content'])
+    elif args.due:
+        if args.limit is None:
+            args.limit = 10
+        print(f"Tasks due '{args.due}' (sorted date ASC), (limit= {args.limit}):")
+        for task in todoist.limit(todoist.all_tasks_due(args.due), args.limit):
+            print(f"{task['created']}: {task['content']}")
 
 
 if __name__ == '__main__':
@@ -83,8 +127,11 @@ if __name__ == '__main__':
                         help="file path to read projects")
 
     # Filters
-    parser.add_argument("project", action="store", help="filter by project name")
+    parser.add_argument("--project", help="filter by project name")
+    parser.add_argument("--due", type=str, help="filter by task due date")
+    parser.add_argument("--limit", type=int, help="limit results")
 
     args = parser.parse_args()
     print(args)
-    # main(projects=args.projects_path, tasks=args.tasks_path)
+
+    main(args)
