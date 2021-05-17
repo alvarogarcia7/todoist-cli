@@ -1,5 +1,5 @@
 import json
-from typing import Dict, List, Tuple, Iterator
+from typing import Dict, List, Tuple, Iterator, Optional
 import argparse
 from datetime import date, timedelta, datetime, timezone
 from dateutil import parser as dateutil_parser
@@ -9,7 +9,7 @@ from dateutil import parser as dateutil_parser
 
 class Tasks:
     def __init__(self, tasks):
-        self.values: List[Dict[id: str]] = tasks
+        self.values: List[Dict[str]] = tasks
 
     def filter_by_project_id(self, project_id) -> List:
         return self._sort_by_created_ASC(
@@ -22,24 +22,32 @@ class Tasks:
                       key=lambda task: task['created']
                       )
 
-    def filter_by_date(self, date_value: date) -> List:
-        result = []
-        for task in self.values:
-            task_date: date = dateutil_parser.parse(task['created'])
-            task['created_date'] = task_date
+    def filter_by_date(self, date_value: datetime) -> List:
+        self._add_created_date()
 
+        result = []
         for task in self.values:
             if task['created_date'] <= date_value:
                 result.append(task)
 
-        result = sorted(result, key=lambda task: task['created_date'], reverse=True)
+        result = self._sort_by_created_date_DESC(result)
 
         return result
+
+    @staticmethod
+    def _sort_by_created_date_DESC(result):
+        result = sorted(result, key=lambda task: task['created_date'], reverse=True)
+        return result
+
+    def _add_created_date(self):
+        for task in self.values:
+            task_date: date = dateutil_parser.parse(task['created'])
+            task['created_date'] = task_date
 
 
 class Projects:
     def __init__(self, projects):
-        self.values: List[Dict[id: str]] = projects
+        self.values: List[Dict[str]] = projects
 
     def _filter_by_name(self, name: str):
         return list(filter(lambda project: project['name'].lower() == name, self.values))
@@ -70,7 +78,7 @@ class Todoist:
         return self.tasks.filter_by_project_id(project_id)
 
     def all_tasks_due(self, duedate: str) -> List:
-        desired_date = None
+        desired_date: Optional[datetime] = None
         if duedate == 'today':
             desired_date = datetime.now(tz=timezone.utc)
         elif duedate == 'yesterday':
@@ -79,7 +87,7 @@ class Todoist:
             desired_date = None
 
         if desired_date is None:
-            desired_date = date.fromisoformat(duedate)
+            desired_date = datetime.fromisoformat(duedate)
 
         return self.tasks.filter_by_date(desired_date)
 
