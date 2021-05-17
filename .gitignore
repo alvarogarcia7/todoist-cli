@@ -3,6 +3,7 @@ keys.sh
 
 ## Data
 *.json
+data_*/
 
 ## Virtual Environment
 venv/*
