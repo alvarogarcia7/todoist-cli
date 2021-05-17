@@ -17,7 +17,7 @@ save-existing-data:
 .PHONY: save-existing-data
 
 update-data:
-	$(MAKE) save-existing-data
+	$(MAKE) save-existing-data || true
 	./get_all_projects.sh
 	./get_all_tasks.sh
 .PHONY: update-data
