@@ -83,9 +83,6 @@ class Todoist:
         elif duedate == 'yesterday':
             desired_date = (datetime.now(tz=timezone.utc) - timedelta(days=1))
         else:
-            desired_date = None
-
-        if desired_date is None:
             desired_date = datetime.fromisoformat(duedate)
 
         return self.tasks.filter_by_date(desired_date)
