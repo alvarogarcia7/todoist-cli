@@ -16,8 +16,36 @@ save-existing-data:
 	mv tmp data/$(shell date +"%Y-%m-%dT%H%M%S")
 .PHONY: save-existing-data
 
-update-data:
+update-data:  ## Sync data from todoist
 	$(MAKE) save-existing-data || true
 	./get_all_projects.sh
 	./get_all_tasks.sh
 .PHONY: update-data
+
+clean: ## Clean the existing database
+	rm -rf budget.db
+
+insert: ## Parse JSON -> SQL
+	sqlite-utils insert ./budget.db tasks --pk=id all_tasks.json
+	sqlite-utils insert ./budget.db projects --pk=id all_projects.json
+	sqlite-utils budget.db "alter table tasks add processed BOOLEAN default FALSE not null;"
+
+select-project-budget:
+	sqlite-utils budget.db "select content,tasks.id,tasks.created from tasks INNER JOIN projects projects on projects.id = tasks.project_id WHERE projects.name='budget'" --json-cols > all_budget.json
+	cp all_budget.json selected_budget.json
+	vim selected_budget.json
+
+process-budget:
+	python3 budget_main.py < selected_budget.json > parsed_budget.json
+	sqlite-utils insert ./budget.db parsed_budget --pk=id parsed_budget.json
+
+select-budget:
+	sqlite-utils budget.db "select '',description,substr(created,1,10),amount from parsed_budget" --csv
+	@echo "Paste and import into Google Sheets"
+	@echo "Date paste as value."
+	@echo "Now process the remaining: make see-diff"
+
+convert-todoist-budget: clean insert select-project-budget process-budget select-budget see-diff
+
+see-diff:
+	@echo "compare files using PyCharm all_budget.json selected_budget.json"

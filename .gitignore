@@ -5,10 +5,17 @@ keys.sh
 *.json
 data/*
 !data/.gitkeep
+budget.db
+budget.txt
 
 ## Virtual Environment
 venv/*
 !venv/.gitkeep
+
+## Python-related
+.py
+.mypy_cache/
+__pycache__/
 
 ## Jetbrains
 .idea/
