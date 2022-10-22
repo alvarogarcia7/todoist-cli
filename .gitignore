@@ -23,3 +23,9 @@ __pycache__/
 ##
 build/
 
+
+# Splitwise
+/splitwise-exporter.sh
+/_OLD_splitwise-export.csv
+splitwise-export-clean.csv
+splitwise-export.csv

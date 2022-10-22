@@ -26,12 +26,18 @@ clean: ## Clean the existing database
 	rm -rf budget.db
 
 insert: ## Parse JSON -> SQL
-	sqlite-utils insert ./budget.db tasks --pk=id all_tasks.json
+	sqlite-utils insert ./budget.db tasks_ --pk=id all_tasks.json
 	sqlite-utils insert ./budget.db projects --pk=id all_projects.json
-	sqlite-utils budget.db "alter table tasks add processed BOOLEAN default FALSE not null;"
+	sqlite-utils budget.db "alter table tasks_ add processed BOOLEAN default FALSE not null;"
+	sqlite3 budget.db ".read create_view_tasks.sql"
+
+_indent-file:
+	jq -r '.' ${FILE} > .temporary.file
+	mv .temporary.file ${FILE}
 
 select-project-budget:
-	sqlite-utils budget.db "select content,tasks.id,tasks.created from tasks INNER JOIN projects projects on projects.id = tasks.project_id WHERE projects.name='budget'" --json-cols > all_budget.json
+	sqlite-utils budget.db "select * from tasks where project_name='budget'" --json-cols > all_budget.json
+	FILE=all_budget.json $(MAKE) _indent-file
 	cp all_budget.json selected_budget.json
 	vim selected_budget.json
 
