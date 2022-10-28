@@ -46,7 +46,7 @@ process-budget:
 	sqlite-utils insert ./budget.db parsed_budget --pk=id parsed_budget.json
 
 select-budget:
-	sqlite-utils budget.db "select '',description,substr(created,1,10),amount from parsed_budget" --csv
+	sqlite-utils budget.db "select '',description,substr(created,1,10),amount from parsed_budget" --csv | pbcopy
 	@echo "Paste and import into Google Sheets"
 	@echo "Date paste as value."
 	@echo "Now process the remaining: make see-diff"
