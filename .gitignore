@@ -29,3 +29,4 @@ build/
 /_OLD_splitwise-export.csv
 splitwise-export-clean.csv
 splitwise-export.csv
+/*.csv
