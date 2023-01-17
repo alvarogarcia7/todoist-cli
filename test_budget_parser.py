@@ -29,6 +29,7 @@ class TestBudgetParser(TestCase):
                     "MCDONALDS-THE GALLERIA",
                     "SALT ABU DHABI",
                     "AL AREESH REST N CAFE"
+
                     ]
 
         input = [
@@ -49,13 +50,18 @@ class TestBudgetParser(TestCase):
             "Credit Card Purchase Card No XXXX0000 AED 50.00 COGNA TECH. SOLUTION ABU DHABI ARE 18/10/21 18:58 available balance AED 1.23 Your statement payment due date is Get up to 10% cashback on online shopping with SHOPSMART. Visit Offers Page on the FAB Mobile app viaje",
             "Credit Card Purchase Card No XXXX0000 AED 2.00 MCDONALDS-THE GALLERIA ABU DHABI ARE available balance AED 1.23 Get up to 10% cashback on online shopping with SHOPSMART. Visit Offers Page on the FAB Mobile app",
             "Credit Card Purchase Card No XXXX0000 AED 32 SALT ABU DHABI ABU DHABI ARE available balance AED 1.23 Get up to 10% cashback on online shopping with SHOPSMART. Visit Offers Page on the FAB Mobile app",
-            "Credit Card Purchase Card No XXXX0000 AED 15.00 AL AREESH REST N CAFE ABU DHABI ARE"
+            "Credit Card Purchase Card No XXXX0000 AED 15.00 AL AREESH REST N CAFE ABU DHABI ARE",
+            # "capricho Credit Card Purchase Card No XXXX0000 AED 15.00 AL AREESH REST N CAFE ABU DHABI ARE"
             ]
+
+        self.ensure_configuration_of_test_cases_is_correct(expected, input)
 
         for case in range(len(input)):
             self.assertEqual(expected[case], self.budget_parser.parse_description(input[case]))
             print("Success with " + case.__str__())
 
+    def ensure_configuration_of_test_cases_is_correct(self, expected, input):
+        self.assertEqual(len(expected), len(input))
 
     def test_parse_credit_card_movement(self):
         self.assertEqual(Decimal('-8.00'),
