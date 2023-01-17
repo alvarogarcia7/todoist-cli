@@ -6,4 +6,4 @@ source ./keys.sh
 
 source ./functions.sh
 
-download_GET "all_tasks.json" "https://api.todoist.com/rest/v1/tasks"
+download_GET "all_tasks.json" "https://api.todoist.com/rest/v2/tasks"
