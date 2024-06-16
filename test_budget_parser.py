@@ -28,8 +28,8 @@ class TestBudgetParser(TestCase):
                     "COGNA TECH. SOLUTION",
                     "MCDONALDS-THE GALLERIA",
                     "SALT ABU DHABI",
-                    "AL AREESH REST N CAFE"
-
+                    "AL AREESH REST N CAFE",
+                    "COGNA TECH. SOLUTION"
                     ]
 
         input = [

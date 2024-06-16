@@ -1,8 +1,11 @@
 .ONESHELL:
 
-test:
-	$(MAKE) typecheck
+test: typecheck test-python
 .PHONY: test
+
+test-python: check-virtual-env
+	pytest .
+.PHONY: test-python
 
 check-virtual-env:
 	@# Test if the variable is set
