@@ -9,5 +9,5 @@ six==1.16.0
 sqlite-fts4==1.0.1
 sqlite-utils==3.16
 tabulate==0.8.9
-typed-ast==1.4.3
+typed-ast==1.5.4
 typing-extensions==3.10.0.0

@@ -10,7 +10,8 @@ from budget_parser import BudgetParser
 def parse_item(x):
     budget_parser = BudgetParser()
     item = budget_parser.parse(x['content'])
-    x['description'] = item.description
+    x['description'] = x['description'] or item.description
+    x['retailer'] = item.description
     x['amount'] = item.amount
     return x
 

@@ -51,8 +51,8 @@ class TestBudgetParser(TestCase):
             "Credit Card Purchase Card No XXXX0000 AED 2.00 MCDONALDS-THE GALLERIA ABU DHABI ARE available balance AED 1.23 Get up to 10% cashback on online shopping with SHOPSMART. Visit Offers Page on the FAB Mobile app",
             "Credit Card Purchase Card No XXXX0000 AED 32 SALT ABU DHABI ABU DHABI ARE available balance AED 1.23 Get up to 10% cashback on online shopping with SHOPSMART. Visit Offers Page on the FAB Mobile app",
             "Credit Card Purchase Card No XXXX0000 AED 15.00 AL AREESH REST N CAFE ABU DHABI ARE",
-            # "capricho Credit Card Purchase Card No XXXX0000 AED 15.00 AL AREESH REST N CAFE ABU DHABI ARE"
-            ]
+            "Credit Card Purchase Card No XXXX0000 AED 15 COGNA TECH. SOLUTION ABU DHABI ARE Available Balance AED 1.00",
+        ]
 
         self.ensure_configuration_of_test_cases_is_correct(expected, input)
 
@@ -60,8 +60,48 @@ class TestBudgetParser(TestCase):
             self.assertEqual(expected[case], self.budget_parser.parse_description(input[case]))
             print("Success with " + case.__str__())
 
+    def test_parse_numbers_2(self):
+        # Do not include any sensitive data in this file / repository
+        cases = [
+            {
+                'expected': "-15",
+                'input': "Credit Card Purchase Card No XXXX0000 AED 15 AL AREESH REST N CAFE ABU DHABI ARE",
+                'description': 'AED, no decimals'
+            },
+            {
+                'expected': "-1.23",
+                'input': "Credit Card Purchase Card No XXXX0000 AED 1.23 AL AREESH REST N CAFE ABU DHABI ARE",
+                'description': 'AED, two decimals'
+            },
+            {
+                'expected': "-1.00",
+                'input': "Credit Card Purchase Card No XXXX0000 AED 1.00 COGNA TECH. SOLUTION ABU DHABI ARE Available Balance AED 1.12",
+                'description': 'AED, two decimals 00, with Available balance (two decimals)'
+            },
+            {
+                'expected': "-3.10",
+                'input': "Credit Card Purchase Card No XXXX0000 AED 3.10 COGNA TECH. SOLUTION ABU DHABI ARE Available Balance AED 1.00",
+                'description': 'AED, two decimals non-00, with Available balance (two decimals)'
+            },
+            {
+                'expected': "-14.99",
+                'input': "Credit Card Purchase Card No XXXX0000 EUR 14.99 COGNA TECH. SOLUTION ABU DHABI ARE Available Balance AED 1.00",
+                'description': 'EUR uppercase, two decimals non-00, with Available balance (two decimals)'
+            },
+            {
+                'expected': "-14.99",
+                'input': "Credit Card Purchase Card No XXXX0000 eur 14.99 COGNA TECH. SOLUTION ABU DHABI ARE Available Balance AED 1.00",
+                'description': 'EUR lowercase, two decimals non-00, with Available balance (two decimals)'
+            },
+        ]
+
+        for case in cases:
+            with self.subTest(msg=case['description'], params=case):
+                self.assertEqual(Decimal(case['expected']), self.budget_parser.parse(case['input']).amount)
+
     def ensure_configuration_of_test_cases_is_correct(self, expected, input):
         self.assertEqual(len(expected), len(input))
+        self.assertTrue(len(expected) > 0)
 
     def test_parse_credit_card_movement(self):
         self.assertEqual(Decimal('-8.00'),
@@ -70,7 +110,8 @@ class TestBudgetParser(TestCase):
                              '00:00 available balance AED 1.23 Your statement payment due date is 01/02/2021'))
 
         self.assertEqual(Decimal('-32'),
-                         self.budget_parser.parse_number('Credit Card Purchase Card No XXXX0000 AED 32 SALT ABU DHABI ABU DHABI'))
+                         self.budget_parser.parse_number(
+                             'Credit Card Purchase Card No XXXX0000 AED 32 SALT ABU DHABI ABU DHABI'))
 
     def test_parse_numbers_are_always_turned_negative(self):
         self.assertEqual(Decimal('-4.00'), self.budget_parser.parse_number('Example. 4,00 eur'))

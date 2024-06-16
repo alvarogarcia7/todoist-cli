@@ -29,7 +29,7 @@ class BudgetParser:
     def parse_number(description: str) -> Decimal:
         value = ""
         if "Credit Card Purchase Card" in description:
-            search = re.compile("([A-Z]{3}) \d+(\.\d{2})?").search(description)
+            search = re.compile("([A-Z]{3}) \d+(\.\d{2})?").search(description.upper())
             if search:
                 value = search.group().split(" ")[1]
         else:
